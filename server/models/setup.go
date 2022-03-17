@@ -1,6 +1,7 @@
 package models
 
 import (
+	"log"
 	"os"
 
 	"github.com/jinzhu/gorm"
@@ -13,7 +14,7 @@ var DB *gorm.DB
 func ConnectionDataBase() {
 	// Checking .env file
 	if err := godotenv.Load(); err != nil {
-		panic("Error loading .env file")
+		log.Printf("Error loading .env file")
 	}
 
 	hostname := os.Getenv("POSTGRES_HOSTNAME")
