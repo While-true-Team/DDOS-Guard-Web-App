@@ -1,9 +1,10 @@
 package controllers
 
 import (
-	"github.com/gin-gonic/gin"
 	"go-server/models"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func FindBooks(c *gin.Context) {
