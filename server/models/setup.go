@@ -1,17 +1,18 @@
 package models
 
 import (
-	"log"
-	"os"
-
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/joho/godotenv"
+	"log"
+	"os"
 )
 
 var DB *gorm.DB
 
 func ConnectionDataBase() {
 	// Checking .env file
+	godotenv.Load()
 	dsn, exist := os.LookupEnv("POSTGRES_CONNECT")
 
 	if !exist {
