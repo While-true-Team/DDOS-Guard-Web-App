@@ -46,6 +46,9 @@ jobs:
         path: ./dist
 
   deploy-stage:
+    needs: build
+    if: success() && github.ref != 'refs/heads/main'
+  
     runs-on: ubuntu-latest
     environment: stage
 
@@ -95,6 +98,8 @@ jobs:
         deployment_id: ${{ steps.deployment.outputs.deployment_id }}
 
   deploy-prod:
+    needs: build
+    if: success() && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: prod
 
