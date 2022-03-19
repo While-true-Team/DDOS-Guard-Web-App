@@ -50,7 +50,9 @@ jobs:
     if: success() && github.ref != 'refs/heads/main'
   
     runs-on: ubuntu-latest
-    environment: stage
+    environment:
+      name: stage
+      url: http://xn--80aaca8d.xn--e1ameg9a5c.xn--p1ai
 
     steps:
     - name: Install SSH Key
@@ -101,7 +103,9 @@ jobs:
     needs: build
     if: success() && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    environment: prod
+    environment:
+      name: prod
+      url: http://xn--e1ameg9a5c.xn--p1ai
 
     steps:
     - name: Install SSH Key
