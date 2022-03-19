@@ -13,17 +13,67 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import {useNavigate} from "react-router-dom";
 import {Copyright} from "../../styled-components/copyright";
+import {ChangeEvent, FormEvent, useState} from "react";
+import {authorizeApi} from "../../services/authorize.service";
+import {LoadingButton} from "@mui/lab";
+import {Save} from "@mui/icons-material";
+import {RegistrationRequest} from "../../models/authorize.model";
 
 
 export default function Registration() {
     const navigate = useNavigate();
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+
+    const [registration, {
+        isLoading: registrationLoading,
+        error: registrationError
+    }] = authorizeApi.useRegistrationMutation();
+
+    const [registrationRequest, setRegistrationRequest] = useState<RegistrationRequest>({
+        email: '',
+        password: '',
+        first_name: '',
+        last_name: ''
+    });
+
+    const handleFirstNameChange = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        setRegistrationRequest(prev => ({
+            ...prev,
+            first_name: event.target.value
+        }))
+    }
+
+    const handleLastNameChange = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        setRegistrationRequest(prev => ({
+            ...prev,
+            last_name: event.target.value
+        }))
+    }
+
+    const handleEmailChange = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        setRegistrationRequest(prev => ({
+            ...prev,
+            email: event.target.value
+        }))
+    }
+
+    const handlePasswordChange = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        setRegistrationRequest(prev => ({
+            ...prev,
+            password: event.target.value
+        }))
+    }
+
+    const handleSubmit = (event: FormEvent) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
+        registration(registrationRequest)
+            .unwrap()
+            .then(() => {
+                navigate('/');
+                return;
+            })
+            .catch(() => {
+                return;
+            });
     };
 
     const handleToSignIn = () => {
@@ -57,6 +107,8 @@ export default function Registration() {
                                 fullWidth
                                 id="firstName"
                                 label="Имя"
+                                value={registrationRequest.first_name}
+                                onChange={handleFirstNameChange}
                                 autoFocus
                             />
                         </Grid>
@@ -68,6 +120,8 @@ export default function Registration() {
                                 label="Фамилия"
                                 name="lastName"
                                 autoComplete="family-name"
+                                value={registrationRequest.last_name}
+                                onChange={handleLastNameChange}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -78,6 +132,8 @@ export default function Registration() {
                                 label="Email адрес"
                                 name="email"
                                 autoComplete="email"
+                                value={registrationRequest.email}
+                                onChange={handleEmailChange}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -89,6 +145,8 @@ export default function Registration() {
                                 type="password"
                                 id="password"
                                 autoComplete="new-password"
+                                value={registrationRequest.password}
+                                onChange={handlePasswordChange}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -98,14 +156,15 @@ export default function Registration() {
                             />
                         </Grid>
                     </Grid>
-                    <Button
+                    <LoadingButton
                         type="submit"
+                        loading={registrationLoading}
                         fullWidth
                         variant="contained"
                         sx={{mt: 3, mb: 2}}
                     >
                         Зарегестрироваться
-                    </Button>
+                    </LoadingButton>
                     <Grid container justifyContent="flex-end">
                         <Grid item>
                             <Link href="#" variant="body2" onClick={handleToSignIn}>

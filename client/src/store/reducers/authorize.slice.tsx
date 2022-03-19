@@ -25,34 +25,23 @@ const initialState: AuthorizeState = {
 const AuthorizeSlice = createSlice({
     name: 'auth',
     initialState,
-    reducers: {
-        testAccessToken: (state: AuthorizeState) => {
-            localStorage.setItem(accessTokenName, 'aboba');
-            state.accessToken = 'aboba'
-            state.refreshToken = 'aboba'
-        }
-    },
+    reducers: {},
     extraReducers: (builder) => {
         const isSuccessAuthAction = isAnyOf(authorizeApi.endpoints.login.matchFulfilled, authorizeApi.endpoints.registration.matchFulfilled, authorizeApi.endpoints.refresh.matchFulfilled);
         builder
             .addMatcher(
                 isSuccessAuthAction,
                 (state: AuthorizeState, action: PayloadAction<AuthorizeResponse>) => {
-                    localStorage.setItem(accessTokenName, action.payload.access_token);
-                    state.accessToken = action.payload.access_token;
-                    state.refreshToken = action.payload.refresh_token;
+                    localStorage.setItem(accessTokenName, action.payload.tokens.access);
+                    state.accessToken = action.payload.tokens.access;
                 })
             .addMatcher(
                 authorizeApi.endpoints.logout.matchFulfilled,
                 (state: AuthorizeState) => {
-                    localStorage.removeItem(accessTokenName);
                     localStorage.removeItem('theme');
-                    state.refreshToken = null;
                     state.accessToken = null;
                 });
     },
 });
-
-export const { testAccessToken } = AuthorizeSlice.actions
 
 export default AuthorizeSlice.reducer;

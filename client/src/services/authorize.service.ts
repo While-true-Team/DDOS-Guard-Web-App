@@ -1,13 +1,16 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import type {AuthorizeResponse, RegistrationRequest, LoginRequest} from '../models/authorize.model';
+// import {store} from "../store";
+// import {accessTokenName} from "../http";
 
 export const authorizeApi = createApi({
     reducerPath: 'authorizeReducer',
     baseQuery: fetchBaseQuery({
-        baseUrl: `${window.location.protocol + "//" + window.location.hostname}:5000/api/`,
+        baseUrl: `${window.location.protocol + "//" + window.location.hostname}:8080/`,
         credentials: 'include',
         prepareHeaders: (headers, {endpoint}) => {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('accessTokenName');
+            // const token = store.getState().authReducer.accessToken;
             if (token && endpoint === 'logout') {
                 headers.set('Authorization', `Bearer ${token}`);
             }
@@ -24,7 +27,7 @@ export const authorizeApi = createApi({
         }),
         registration: builder.mutation<AuthorizeResponse, RegistrationRequest>({
             query: (credentials) => ({
-                url: 'registration',
+                url: 'register',
                 method: 'POST',
                 body: credentials,
             }),

@@ -7,13 +7,14 @@ import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import {FC, useContext} from "react";
 import {ChosenTheme} from "../../providers";
 import {styled, Switch} from "@mui/material";
 import {useNavigate} from "react-router-dom";
+import {authorizeApi} from "../../services/authorize.service";
+
 
 const ThemeSwitch = styled(Switch)(({theme}) => ({
     width: 62,
@@ -99,12 +100,18 @@ const AppBar: FC = () => {
     const {theme, setTheme} = useContext(ChosenTheme);
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+    const [logout, {}] = authorizeApi.useLogoutMutation();
 
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget);
     };
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElUser(event.currentTarget);
+    };
+
+    const handleLogout = async () => {
+        await logout();
+        handleCloseUserMenu();
     };
 
     const handleCloseNavMenu = () => {
@@ -116,18 +123,18 @@ const AppBar: FC = () => {
     };
 
     const handleGoToProfile = (): void => {
-        navigate('/account');
+        navigate('/');
         handleCloseUserMenu();
-    }
+    };
 
     const handleGoHome = (): void => {
         navigate('/');
         handleCloseUserMenu();
-    }
+    };
 
     return (
         <MuiAppBar sx={{padding: '10px', top: 0}} position="sticky">
-            <Container maxWidth="xl" >
+            <Container maxWidth="xl">
                 <Toolbar>
                     <Typography
                         noWrap
@@ -170,6 +177,9 @@ const AppBar: FC = () => {
                         >
                             <MenuItem onClick={handleGoToProfile}>
                                 <Typography textAlign="center">Профиль</Typography>
+                            </MenuItem>
+                            <MenuItem onClick={handleLogout}>
+                                <Typography textAlign="center">Выйти из аккаунта</Typography>
                             </MenuItem>
                         </Menu>
                     </Box>

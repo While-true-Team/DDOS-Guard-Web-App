@@ -11,8 +11,6 @@ const RootStyle = styled(Box)(({theme}) => ({
     paddingBottom: theme.spacing(10)
 }));
 
-// ----------------------------------------------------------------------
-
 export default function NotFound() {
     return (
         <RootStyle>

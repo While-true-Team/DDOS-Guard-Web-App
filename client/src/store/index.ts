@@ -1,13 +1,12 @@
-import {configureStore, ThunkAction, Action, combineReducers} from "@reduxjs/toolkit";
-import {authorizeApi} from "../services/authorize.service";
+import {configureStore, ThunkAction, Action} from "@reduxjs/toolkit";
 import {setupListeners} from "@reduxjs/toolkit/query";
 import authReducer from "./reducers/authorize.slice";
-
+import {authorizeApi} from "../services/authorize.service";
 
 export const store = configureStore({
     reducer: {
+        [authorizeApi.reducerPath]: authorizeApi.reducer,
         authReducer,
-        [authorizeApi.reducerPath]: authorizeApi.reducer
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(authorizeApi.middleware),
 });

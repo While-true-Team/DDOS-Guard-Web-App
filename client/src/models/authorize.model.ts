@@ -1,13 +1,21 @@
 interface AuthorizeResponse {
-    access_token: string;
-    refresh_token: string;
+    access: string;
+    // TODO ниже старая нотация токена
+    tokens: {
+        access: string;
+    }
 }
 
 interface LoginRequest {
-    login: string;
+    email: string;
     password: string;
 }
 
-type RegistrationRequest = LoginRequest;
+interface RegistrationRequest {
+    email: string;
+    password: string;
+    first_name: string;
+    last_name: string;
+}
 
 export type {AuthorizeResponse, LoginRequest, RegistrationRequest}

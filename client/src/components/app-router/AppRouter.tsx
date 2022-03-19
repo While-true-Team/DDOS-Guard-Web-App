@@ -1,10 +1,14 @@
 import React, {FC, Suspense} from "react";
 import {Routes, Route, BrowserRouter as Router} from "react-router-dom";
 import AppBar from '../app-bar/AppBar'
-import SignIn from "../../pages/sign-in/SignIn";
 import {CircularProgress} from "@mui/material";
-import NotFound from "../../pages/not-found/NotFound";
-const AccountPage = React.lazy(() => import('../../pages/account/Account'))
+import {useAppSelector} from "../../hooks/redux.hooks";
+import {getAccessToken} from "../../store/selectors/token.selector";
+
+const AccountPage = React.lazy(() => import('../../pages/account/Account'));
+const NotFound = React.lazy(() => import('../../pages/not-found/NotFound'));
+const SignIn = React.lazy(() => import('../../pages/sign-in/SignIn'));
+const SignUp = React.lazy(() => import('../../pages/sign-up/SignUp'));
 
 const account = (
     <Suspense fallback={<CircularProgress/>}>
@@ -12,15 +16,50 @@ const account = (
     </Suspense>
 );
 
-const AppRouter: FC = () => (
-    <Router>
+const notFound = (
+    <Suspense fallback={<CircularProgress/>}>
+        <NotFound/>
+    </Suspense>
+);
+
+const signIn = (
+    <Suspense fallback={<CircularProgress/>}>
+        <SignIn/>
+    </Suspense>
+);
+
+const signUp = (
+    <Suspense fallback={<CircularProgress/>}>
+        <SignUp/>
+    </Suspense>
+);
+
+const AppRoutes = (
+    <>
         <AppBar/>
         <Routes>
-            <Route path="/" element={<SignIn/>}/>
-            <Route path='/account' element={account}/>
-            <Route path="*" element={<NotFound/>} />
+            <Route path='/' element={account}/>
+            <Route path="*" element={notFound}/>
         </Routes>
-    </Router>
-);
+    </>
+)
+
+const AuthorizeRoutes = (
+    <Routes>
+        <Route path='/' element={signIn}/>
+        <Route path='/sign-up' element={signUp}/>
+        <Route path="*" element={notFound}/>
+    </Routes>
+)
+
+
+const AppRouter: FC = () => {
+    const accessToken = useAppSelector(getAccessToken)
+    return (
+        <Router>
+            {accessToken ? AppRoutes : AuthorizeRoutes}
+        </Router>
+    );
+}
 
 export default AppRouter;
