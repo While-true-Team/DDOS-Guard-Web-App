@@ -40,4 +40,4 @@ jobs:
     # - run: npm test
     
     - name: Deploy static content to local server (rsync)
-      run: rsync -avz ./client/dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/ddg-app
+      run: rsync -avz ./client/dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/ddg-app/
