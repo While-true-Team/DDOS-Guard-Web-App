@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"go-server/models"
 	"net/http"
 	"os"
@@ -29,11 +28,12 @@ func RegisterUser(c *gin.Context) {
 	user := models.User{Email: input.Email, Password: input.Password, FirstName: input.FirstName, LastName: input.LastName}
 	models.DB.Create(&user)
 
-	tokens := models.Token{Access: CreateToken(user), Refresh: CreateTokenRefresh(user)}
+	tokens := models.Token{ID: user.ID, Access: CreateToken(user), Refresh: CreateTokenRefresh()}
 
 	models.DB.Create(&tokens)
 
-	c.JSON(http.StatusOK, gin.H{"tokens": tokens})
+	c.SetCookie("refresh_token", tokens.Refresh, 60*60*24*30, "/", "localhost", false, true) // if https: secure = true
+	c.JSON(http.StatusOK, gin.H{"tokens": tokens.Access})
 }
 
 func LoginUser(c *gin.Context) {
@@ -56,11 +56,36 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 
-	tokens := models.Token{Access: CreateToken(user), Refresh: CreateTokenRefresh(user)}
+	token := models.Token{}
+	tokens := models.Token{ID: user.ID, Access: CreateToken(user), Refresh: CreateTokenRefresh()}
 
-	models.DB.Create(&tokens)
+	if err := models.DB.Where("id=?", user.ID).First(&token).Error; err != nil {
+		models.DB.Create(&tokens)
+		c.SetCookie("refresh_token", tokens.Refresh, 60*60*24*30, "/", "localhost", false, true) // if https: secure = true
+		c.JSON(http.StatusOK, gin.H{"access": tokens.Access})
+		return
+	}
 
-	c.JSON(http.StatusOK, gin.H{"tokens": tokens})
+	models.DB.Model(&token).Updates(tokens)
+	c.SetCookie("refresh_token", tokens.Refresh, 60*60*24*30, "/", "localhost", false, true) // if https: secure = true
+	c.JSON(http.StatusOK, gin.H{"access": tokens})
+}
+
+func Logout(c *gin.Context) {
+
+	token := models.Token{}
+
+	refreshToken, err := c.Cookie("refresh_token")
+
+	if err != nil {
+		return
+	}
+
+	if err := models.DB.Where("refresh=?", refreshToken).First(&token).Error; err == nil {
+		models.DB.Delete(&token)
+	}
+
+	c.SetCookie("refresh_token", "", -1, "/", "", false, true)
 }
 
 func CreateToken(user models.User) string {
@@ -74,33 +99,56 @@ func CreateToken(user models.User) string {
 	return jwtToken
 }
 
-func CreateTokenRefresh(user models.User) string {
+func CreateTokenRefresh() string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":    user.ID,
-		"email": user.Email,
-		"exp":   time.Now().Add(time.Hour * 7200).Unix(),
+		"exp": time.Now().Add(time.Hour * 7200).Unix(),
 	})
 
 	jwtToken, _ := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	return jwtToken
 }
 
-// DecodeToken W.I.P.
-func DecodeToken() {
+func CheckToken(token string) bool {
 	type MyCustomClaims struct {
 		ID    uint   `json:"userid"`
 		Email string `json:"email"`
 		jwt.StandardClaims
 	}
 
-	tokenString := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InpvbG90YXIzMzNAZ21haWwuY29tIiwiZXhwIjoxNjQ3NjgzMjIxLCJ1c2VyaWQiOjJ9.PeIGk7amOAc2MLK1erp05nA1Wy3q99SKe1w0egrpIc8"
-	token, err := jwt.ParseWithClaims(tokenString, &MyCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+	tokenParse, _ := jwt.ParseWithClaims(token, &MyCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("JWT_SECRET")), nil
 	})
 
-	if claims, ok := token.Claims.(*MyCustomClaims); ok && token.Valid {
-		fmt.Printf("%v %v", claims.ID, claims.StandardClaims.ExpiresAt)
-	} else {
-		fmt.Println(err)
+	if _, ok := tokenParse.Claims.(*MyCustomClaims); ok && tokenParse.Valid {
+		return true
 	}
+	return false
+}
+
+func Refresh(c *gin.Context) {
+	tokenRefresh, err := c.Cookie("refresh_token")
+	if err != nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "refresh token not found"})
+		return
+	}
+
+	token := models.Token{}
+
+	if err := models.DB.Where("refresh=?", tokenRefresh).First(&token).Error; err == nil && CheckToken(tokenRefresh) {
+		user := models.User{}
+
+		models.DB.Where("id=?", token.ID).First(&user)
+
+		newToken := CreateToken(user)
+		//хардкод - наше всё!
+		newTokenStruct := models.Token{Access: newToken}
+
+		models.DB.Model(&token).Updates(newTokenStruct)
+		c.JSON(http.StatusOK, gin.H{"access": newToken})
+		return
+	} else if !CheckToken(tokenRefresh) {
+		models.DB.Delete(&token)
+	}
+
+	c.JSON(http.StatusConflict, gin.H{"error": "refresh token invalid"})
 }

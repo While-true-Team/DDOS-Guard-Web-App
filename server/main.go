@@ -19,8 +19,10 @@ func main() {
 
 	r.GET("/books", controllers.FindBooks)
 	r.GET("/books/:id", controllers.FindBook)
+	r.POST("/logout", services.Logout)
 	r.POST("/login", services.LoginUser)
 	r.POST("/register", services.RegisterUser)
+	r.POST("/refresh", services.Refresh)
 	r.POST("/books", controllers.CreateBook)
 	r.PATCH("/books/:id", controllers.UpdateBook)
 	r.DELETE("/books/:id", controllers.DeleteBook)
