@@ -43,7 +43,7 @@ jobs:
       uses: actions/upload-artifact@master
       with:
         name: client-static
-        path: ./dist
+        path: client/dist/
 
   deploy-stage:
     needs: build
@@ -76,7 +76,7 @@ jobs:
       uses: actions/download-artifact@master
       with:
         name: client-static
-        path: ./dist
+        path: client/dist/
     - name: Deploy static content to local server (rsync)
       run: rsync -avz ./dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/ddg-app-stage
 
