@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go-server/controllers"
 	"go-server/models"
+	"go-server/services"
 )
 
 func main() {
@@ -18,8 +19,8 @@ func main() {
 
 	r.GET("/books", controllers.FindBooks)
 	r.GET("/books/:id", controllers.FindBook)
-	r.POST("/login", controllers.LoginUser)
-	r.POST("/create", controllers.RegisterUser)
+	r.POST("/login", services.LoginUser)
+	r.POST("/register", services.RegisterUser)
 	r.POST("/books", controllers.CreateBook)
 	r.PATCH("/books/:id", controllers.UpdateBook)
 	r.DELETE("/books/:id", controllers.DeleteBook)
