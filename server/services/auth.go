@@ -28,7 +28,11 @@ func RegisterUser(c *gin.Context) {
 	user := models.User{Email: input.Email, Password: input.Password, FirstName: input.FirstName, LastName: input.LastName}
 	models.DB.Create(&user)
 
-	c.JSON(http.StatusOK, gin.H{"data": user})
+	tokens := models.Token{Access: CreateToken(user), Refresh: CreateTokenRefresh(user)}
+
+	models.DB.Create(&tokens)
+
+	c.JSON(http.StatusOK, gin.H{"tokens": tokens})
 }
 
 func LoginUser(c *gin.Context) {
