@@ -20,7 +20,6 @@ func ConnectionDataBase() {
 	}
 
 	// Database connection
-	// TODO сделать красиво и удобно в будущем
 	database, err := gorm.Open("postgres", dsn)
 
 	if err != nil {
@@ -28,7 +27,7 @@ func ConnectionDataBase() {
 	}
 
 	// Adding schema to database
-	database.AutoMigrate(&Book{})
+	database.AutoMigrate(&Book{}, &User{}, &Token{})
 
 	DB = database
 }
