@@ -76,9 +76,9 @@ jobs:
       uses: actions/download-artifact@master
       with:
         name: client-static
-        path: client/dist/
+        path: dist/
     - name: Deploy static content to local server (rsync)
-      run: rsync -avz ./dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/ddg-app-stage
+      run: rsync -avz dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/ddg-app-stage
 
     - name: Update deployment status (success)
       if: success()
@@ -127,9 +127,9 @@ jobs:
       uses: actions/download-artifact@master
       with:
         name: client-static
-        path: ./dist
+        path: dist/
     - name: Deploy static content to local server (rsync)
-      run: rsync -avz ./dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/ddg-app/
+      run: rsync -avz dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/ddg-app/
 
     - name: Update deployment status (success)
       if: success()
