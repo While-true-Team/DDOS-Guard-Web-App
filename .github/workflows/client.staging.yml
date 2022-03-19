@@ -1,11 +1,11 @@
-name: Client-side CI
+name: Client-side (staging)
 
 on:
-  push:
+  pull_request:
+    branches: [ main ]
     paths:
       - ".github/workflows/node.js.yml"
       - "client/**"
-
 
 jobs:
   build:
@@ -43,9 +43,9 @@ jobs:
         name: client-static
         path: client/dist/
 
-  deploy-stage:
+  deploy:
     needs: build
-    if: success() && github.ref != 'refs/heads/main'
+    if: success()
   
     runs-on: ubuntu-latest
     environment:
@@ -94,58 +94,5 @@ jobs:
       with:
         token: "${{ github.token }}"
         target_url: http://xn--80aaca8d.xn--e1ameg9a5c.xn--p1ai
-        state: "failure"
-        deployment_id: ${{ steps.deployment.outputs.deployment_id }}
-
-  deploy-prod:
-    needs: build
-    if: success() && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    environment:
-      name: prod
-      url: http://xn--e1ameg9a5c.xn--p1ai
-
-    steps:
-    - name: Install SSH Key
-      uses: shimataro/ssh-key-action@v2
-      with:
-        key: ${{ secrets.SSH_PRIVATE_DEPLOY }}
-        known_hosts: 'just-a-placeholder-so-we-dont-get-errors'
-    - name: Adding Known Hosts
-      run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-      working-directory: .
-
-    - uses: actions/checkout@master
-
-    - name: Create GitHub deployment
-      uses: chrnorm/deployment-action@releases/v1
-      id: deployment
-      with:
-        token: "${{ github.token }}"
-        target_url: https://xn--e1ameg9a5c.xn--p1ai
-        environment: prod
-
-    - name: Download static content
-      uses: actions/download-artifact@master
-      with:
-        name: client-static
-        path: dist/
-    - name: Deploy static content to local server (rsync)
-      run: rsync -avz dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/ddg-app/
-
-    - name: Update deployment status (success)
-      if: success()
-      uses: chrnorm/deployment-status@releases/v1
-      with:
-        token: "${{ github.token }}"
-        target_url: https://xn--e1ameg9a5c.xn--p1ai
-        state: "success"
-        deployment_id: ${{ steps.deployment.outputs.deployment_id }}
-    - name: Update deployment status (failure)
-      if: failure()
-      uses: chrnorm/deployment-status@releases/v1
-      with:
-        token: "${{ github.token }}"
-        target_url: https://xn--e1ameg9a5c.xn--p1ai
         state: "failure"
         deployment_id: ${{ steps.deployment.outputs.deployment_id }}
