@@ -68,7 +68,7 @@ func LoginUser(c *gin.Context) {
 
 	models.DB.Model(&token).Updates(tokens)
 	c.SetCookie("refresh_token", tokens.Refresh, 60*60*24*30, "/", "localhost", false, true) // if https: secure = true
-	c.JSON(http.StatusOK, gin.H{"access": tokens})
+	c.JSON(http.StatusOK, gin.H{"access": tokens.Access})
 }
 
 func Logout(c *gin.Context) {
