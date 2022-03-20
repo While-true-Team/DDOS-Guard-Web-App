@@ -78,6 +78,7 @@ func Logout(c *gin.Context) {
 	refreshToken, err := c.Cookie("refresh_token")
 
 	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
@@ -86,6 +87,7 @@ func Logout(c *gin.Context) {
 	}
 
 	c.SetCookie("refresh_token", "", -1, "/", "", false, true)
+	c.JSON(http.StatusOK, gin.H{"response": "you have successfully logout"})
 }
 
 func CreateToken(user models.User) string {
