@@ -26,7 +26,7 @@ import {
     validatePassword,
     validateName,
     validateEmail
-} from "../../../validators/authorization.validators";
+} from "../../validators/authorization.validators";
 import {StyledLink} from "../../styled-components/link";
 import ReportIcon from "@mui/icons-material/Report";
 

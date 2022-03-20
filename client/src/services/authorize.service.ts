@@ -33,7 +33,7 @@ export const authorizeApi = createApi({
         refresh: builder.mutation<AuthorizeResponse, void>({
             query: () => ({
                 url: 'refresh',
-                method: 'GET',
+                method: 'POST',
             }),
         }),
         logout: builder.mutation<AuthorizeResponse, void>({

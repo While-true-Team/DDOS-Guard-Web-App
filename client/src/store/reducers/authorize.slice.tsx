@@ -47,9 +47,9 @@ const AuthorizeSlice = createSlice({
             .addMatcher(
                 isSuccessAuthAction,
                 (state: AuthorizeState, action: PayloadAction<AuthorizeResponse>) => {
-                    state.accessToken = action.payload.tokens.access;
-                    state.userCredentials.email = jwtDecode<TokenPayload>(action.payload.tokens.access).email;
-                    console.log(jwtDecode(action.payload.tokens.access));
+                    state.accessToken = action.payload.access;
+                    state.userCredentials.email = jwtDecode<TokenPayload>(action.payload.access).email;
+                    console.log(jwtDecode(action.payload.access));
                 })
             .addMatcher(
                 isLogoutAction,

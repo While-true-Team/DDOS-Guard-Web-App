@@ -17,7 +17,7 @@ import {ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useState} from 
 import ReportIcon from '@mui/icons-material/Report';
 import {Alert, AlertTitle, LoadingButton} from "@mui/lab";
 import {StyledLink} from "../../styled-components/link";
-import {validateEmail, validatePassword} from "../../../validators/authorization.validators";
+import {validateEmail, validatePassword} from "../../validators/authorization.validators";
 import IconButton from "@mui/material/IconButton";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
 

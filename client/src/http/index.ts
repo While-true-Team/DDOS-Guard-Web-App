@@ -10,6 +10,7 @@ import {AuthorizeResponse} from "../models/authorize.model";
 import {authorizeApi} from "../services/authorize.service";
 import type {RootState} from '../store'
 
+
 const baseQuery = fetchBaseQuery({
     baseUrl: `${window.location.protocol + "//" + window.location.hostname}:8080/`,
     prepareHeaders: (headers, {

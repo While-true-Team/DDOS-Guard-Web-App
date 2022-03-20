@@ -1,9 +1,5 @@
 interface AuthorizeResponse {
     access: string;
-    // TODO ниже старая нотация токена
-    tokens: {
-        access: string;
-    }
 }
 
 interface LoginRequest {
