@@ -32,7 +32,7 @@ func RegisterUser(c *gin.Context) {
 
 	models.DB.Create(&tokens)
 
-	c.SetCookie("refresh_token", tokens.Refresh, 60*60*24*30, "/", "localhost", false, true) // if https: secure = true
+	c.SetCookie("refresh_token", tokens.Refresh, 60*60*24*30, "/", "", false, true) // if https: secure = true
 	c.JSON(http.StatusOK, gin.H{"tokens": tokens.Access})
 }
 
@@ -61,13 +61,13 @@ func LoginUser(c *gin.Context) {
 
 	if err := models.DB.Where("id=?", user.ID).First(&token).Error; err != nil {
 		models.DB.Create(&tokens)
-		c.SetCookie("refresh_token", tokens.Refresh, 60*60*24*30, "/", "localhost", false, true) // if https: secure = true
+		c.SetCookie("refresh_token", tokens.Refresh, 60*60*24*30, "/", "", false, true) // if https: secure = true
 		c.JSON(http.StatusOK, gin.H{"access": tokens.Access})
 		return
 	}
 
 	models.DB.Model(&token).Updates(tokens)
-	c.SetCookie("refresh_token", tokens.Refresh, 60*60*24*30, "/", "localhost", false, true) // if https: secure = true
+	c.SetCookie("refresh_token", tokens.Refresh, 60*60*24*30, "/", "", false, true) // if https: secure = true
 	c.JSON(http.StatusOK, gin.H{"access": tokens.Access})
 }
 
