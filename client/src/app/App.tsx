@@ -1,12 +1,19 @@
-import { FC } from "react";
+import {FC, useEffect} from "react";
 import AppRouter from "../components/app-router/AppRouter";
-import "./App.scss";
+import {authorizeApi} from "../services/authorize.service";
 
 const App: FC = () => {
+    const [checkAuthorization, {
+        isLoading: checkAuthLoading,
+        error: loginError,
+    }] = authorizeApi.useRefreshMutation();
+
+    useEffect(() => {
+        checkAuthorization();
+    }, []);
+
     return (
-        <>
-            <AppRouter />
-        </>
+        <AppRouter/>
     );
 };
 

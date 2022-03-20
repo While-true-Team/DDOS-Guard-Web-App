@@ -1,11 +1,12 @@
 package models
 
 import (
+	"log"
+	"os"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
-	"log"
-	"os"
 )
 
 var DB *gorm.DB
@@ -20,7 +21,6 @@ func ConnectionDataBase() {
 	}
 
 	// Database connection
-	// TODO сделать красиво и удобно в будущем
 	database, err := gorm.Open("postgres", dsn)
 
 	if err != nil {
@@ -28,7 +28,7 @@ func ConnectionDataBase() {
 	}
 
 	// Adding schema to database
-	database.AutoMigrate(&Book{})
+	database.AutoMigrate(&Book{}, &User{}, &Token{}, &EmailCheck{})
 
 	DB = database
 }
