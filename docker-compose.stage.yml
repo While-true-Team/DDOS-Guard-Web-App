@@ -1,0 +1,21 @@
+version: '3.4'
+
+services:
+  webstarterkit:
+    image: ghcr.io/while-true-team/ddos-guard-web-app:pr-2
+    environment:
+      - GIN_MODE=release
+      - POSTGRES_CONNECT=${POSTGRES_CONNECT}
+      - JWT_SECRET=${JWT_SECRET}
+    ports:
+      - 8081:8080
+  static:
+    image: nginx:latest
+    volumes:
+      - /var/www/ddg-app-stage:/usr/share/nginx/html
+      - /etc/nginx/nginx.stage.conf:/etc/nginx/nginx.conf
+    ports:
+      - 81:80
+  test:
+    image: ubuntu
+    entrypoint: bash
