@@ -21,7 +21,7 @@ func RegisterUser(c *gin.Context) {
 	var userCheck models.User
 
 	if err := models.DB.Where("email=?", input.Email).First(&userCheck).Error; err == nil {
-		c.JSON(http.StatusConflict, gin.H{"error": "Account has already been registered"})
+		c.JSON(http.StatusConflict, gin.H{"error": "Электронная почта уже занята"})
 		return
 	}
 
@@ -47,12 +47,12 @@ func LoginUser(c *gin.Context) {
 	var user models.User
 
 	if err := models.DB.Where("email=?", input.Email).First(&user).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found!"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Пользователь не найден!"})
 		return
 	}
 
 	if user.Password != input.Password {
-		c.JSON(http.StatusForbidden, gin.H{"error": "Incorrect password!"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "Неверный пароль!"})
 		return
 	}
 
@@ -87,7 +87,7 @@ func Logout(c *gin.Context) {
 	}
 
 	c.SetCookie("refresh_token", "", -1, "/", "", false, true)
-	c.JSON(http.StatusOK, gin.H{"response": "you have successfully logout"})
+	c.JSON(http.StatusOK, gin.H{"response": "Вы успешно вышли из системы"})
 }
 
 func CreateToken(user models.User) string {
@@ -130,7 +130,7 @@ func CheckToken(token string) bool {
 func Refresh(c *gin.Context) {
 	tokenRefresh, err := c.Cookie("refresh_token")
 	if err != nil {
-		c.JSON(http.StatusConflict, gin.H{"error": "refresh token not found"})
+		c.JSON(http.StatusConflict, gin.H{"error": "Рефреш токен не найден"})
 		return
 	}
 
@@ -152,5 +152,5 @@ func Refresh(c *gin.Context) {
 		models.DB.Delete(&token)
 	}
 
-	c.JSON(http.StatusConflict, gin.H{"error": "refresh token invalid"})
+	c.JSON(http.StatusConflict, gin.H{"error": "Рефреш токен не валидный"})
 }
