@@ -31,6 +31,7 @@ jobs:
         uses: docker/metadata-action@v3.6.2
         with:
           images: ghcr.io/${{ github.repository }}
+          tags: stage
           github-token: ${{ github.token }}
 
       - name: Build and push Docker images
@@ -38,5 +39,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository }}:stage
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
