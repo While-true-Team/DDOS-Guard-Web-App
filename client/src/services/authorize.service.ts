@@ -23,13 +23,6 @@ export const authorizeApi = createApi({
                 body: credentials,
             }),
         }),
-        registration: builder.mutation<AuthorizeResponse, RegistrationRequest>({
-            query: (credentials) => ({
-                url: 'register',
-                method: 'POST',
-                body: credentials,
-            }),
-        }),
         refresh: builder.mutation<AuthorizeResponse, void>({
             query: () => ({
                 url: 'refresh',

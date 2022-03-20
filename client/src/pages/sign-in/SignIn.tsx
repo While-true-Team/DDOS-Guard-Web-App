@@ -8,7 +8,7 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import {Dialog, FormControl, InputAdornment, InputLabel, OutlinedInput, styled, TextField} from "@mui/material";
+import {Dialog, FormControl, InputAdornment, InputLabel, OutlinedInput, Paper, styled, TextField} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import {Copyright} from "../../styled-components/copyright";
 import {authorizeApi} from "../../services/authorize.service";
@@ -17,7 +17,7 @@ import {ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useState} from 
 import ReportIcon from '@mui/icons-material/Report';
 import {Alert, AlertTitle, LoadingButton} from "@mui/lab";
 import {StyledLink} from "../../styled-components/link";
-import {validateEmail, validatePassword} from "../../validators/authorization.validators";
+import {validateEmail} from "../../validators/authorization.validators";
 import IconButton from "@mui/material/IconButton";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
 
@@ -66,7 +66,7 @@ export default function SignIn() {
         }))
     }
 
-    const isNotValidForm = validatePassword(loginRequest.password) || validateEmail(loginRequest.email)
+    const isNotValidForm = validateEmail(loginRequest.email);
 
     const handleSubmit = (event: FormEvent) => {
         event.preventDefault();
@@ -119,15 +119,13 @@ export default function SignIn() {
                             onChange={handleLoginRequestEmailChange}
                         />
                         <FormControl sx={{width: '100%'}} variant="outlined">
-                            <InputLabel required
-                                        error={validatePassword(loginRequest.password)}>Пароль</InputLabel>
+                            <InputLabel required>Пароль</InputLabel>
                             <OutlinedInput
                                 fullWidth
                                 required
                                 inputProps={{
                                     maxLength: 30
                                 }}
-                                error={validatePassword(loginRequest.password)}
                                 type={loginRequest.showPassword ? 'text' : 'password'}
                                 value={loginRequest.password}
                                 onChange={handleLoginRequestPasswordChange}
@@ -167,7 +165,7 @@ export default function SignIn() {
                                 </StyledLink>
                             </Grid>
                             <Grid item>
-                                <StyledLink title='Перейти к регистрации.' variant="body2" onClick={handleGoToSignUp}>
+                                <StyledLink mr={1} title='Перейти к регистрации.' variant="body2" onClick={handleGoToSignUp}>
                                     Нет аккаунта? Зарегестрируйтесь!
                                 </StyledLink>
                             </Grid>

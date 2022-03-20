@@ -16,4 +16,8 @@ interface RegistrationRequest {
     showPassword?: boolean;
 }
 
-export type {AuthorizeResponse, LoginRequest, RegistrationRequest}
+interface RegistrationResponse {
+    message: string;
+}
+
+export type {AuthorizeResponse, LoginRequest, RegistrationRequest, RegistrationResponse}

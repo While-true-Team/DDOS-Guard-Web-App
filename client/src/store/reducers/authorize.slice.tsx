@@ -41,7 +41,7 @@ const AuthorizeSlice = createSlice({
     initialState,
     reducers: {},
     extraReducers: (builder) => {
-        const isSuccessAuthAction = isAnyOf(authorizeApi.endpoints.login.matchFulfilled, authorizeApi.endpoints.registration.matchFulfilled, authorizeApi.endpoints.refresh.matchFulfilled);
+        const isSuccessAuthAction = isAnyOf(authorizeApi.endpoints.login.matchFulfilled, authorizeApi.endpoints.refresh.matchFulfilled);
         const isLogoutAction = isAnyOf(authorizeApi.endpoints.logout.matchFulfilled, authorizeApi.endpoints.logout.matchRejected)
         builder
             .addMatcher(
@@ -49,7 +49,6 @@ const AuthorizeSlice = createSlice({
                 (state: AuthorizeState, action: PayloadAction<AuthorizeResponse>) => {
                     state.accessToken = action.payload.access;
                     state.userCredentials.email = jwtDecode<TokenPayload>(action.payload.access).email;
-                    console.log(jwtDecode(action.payload.access));
                 })
             .addMatcher(
                 isLogoutAction,

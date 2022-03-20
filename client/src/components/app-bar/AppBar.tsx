@@ -101,15 +101,11 @@ const DDosLogo = styled('div')(({theme}) => ({
 const AppBar: FC = () => {
     const navigate = useNavigate();
     const {theme, setTheme} = useContext(ChosenTheme);
-    const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
     const [logout, {}] = authorizeApi.useLogoutMutation();
 
     const userEmail = useAppSelector(getUserMail)
 
-    const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorElNav(event.currentTarget);
-    };
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElUser(event.currentTarget);
     };
@@ -117,10 +113,6 @@ const AppBar: FC = () => {
     const handleLogout = async () => {
         await logout();
         handleCloseUserMenu();
-    };
-
-    const handleCloseNavMenu = () => {
-        setAnchorElNav(null);
     };
 
     const handleCloseUserMenu = () => {
@@ -187,7 +179,7 @@ const AppBar: FC = () => {
                             }
                             <Divider orientation='horizontal'/>
                             <MenuItem onClick={handleGoToProfile}>
-                                <Typography textAlign="center">Профиль</Typography>
+                                <Typography textAlign="center">Настройки</Typography>
                             </MenuItem>
                             <MenuItem onClick={handleLogout}>
                                 <Typography textAlign="center">Выйти из аккаунта</Typography>

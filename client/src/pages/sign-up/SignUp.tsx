@@ -1,11 +1,9 @@
 import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
@@ -13,30 +11,28 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import {useNavigate} from "react-router-dom";
 import {Copyright} from "../../styled-components/copyright";
-import {ChangeEvent, FormEvent, useEffect, useState} from "react";
-import {authorizeApi} from "../../services/authorize.service";
-import {Alert, AlertTitle, LoadingButton} from "@mui/lab";
-import {Save, Visibility, VisibilityOff} from "@mui/icons-material";
+import {ChangeEvent, FormEvent, useState} from "react";
+import {AlertTitle, Alert} from '@mui/material'
+import {LoadingButton} from "@mui/lab";
+import {Done, Visibility, VisibilityOff} from "@mui/icons-material";
 import {RegistrationRequest} from "../../models/authorize.model";
-import isEmail from 'validator/lib/isEmail';
-import validator from "validator";
 import {Dialog, FormControl, InputAdornment, InputLabel, OutlinedInput, styled} from '@mui/material';
 import IconButton from "@mui/material/IconButton";
 import {
-    validatePassword,
     validateName,
     validateEmail
 } from "../../validators/authorization.validators";
 import {StyledLink} from "../../styled-components/link";
 import ReportIcon from "@mui/icons-material/Report";
+import {registration} from "../../services/registration.service";
+
+const SuccessRegistrationDialog = styled(Dialog)(({theme}) => ({
+    padding: '5px',
+    variant: 'success'
+}))
 
 export default function Registration() {
     const navigate = useNavigate();
-
-    const [registration, {
-        isLoading: registrationLoading,
-        error: registrationError
-    }] = authorizeApi.useRegistrationMutation();
 
     const handleClickShowPassword = () => {
         setRegistrationRequest((prev) => ({
@@ -45,18 +41,30 @@ export default function Registration() {
         }))
     }
 
-    const [openAlert, setOpenAlert] = useState<boolean>(false)
+    const [registrationLoading, setRegistrationLoading] = useState(false)
 
-    useEffect(() => {
-        if (registrationError) {
-            setOpenAlert(true)
-        }
-    }, [registrationError])
+    const [errorAlert, setErrorAlert] = useState({
+        open: false,
+        message: ''
+    })
+    const [successAlert, setSuccessAlert] = useState({
+        open: false,
+        message: ''
+    });
 
-    const handleCloseAlert = () => {
-        setOpenAlert(false);
-    }
+    const handleCloseErrorAlert = () => {
+        setErrorAlert(prev => ({
+            ...prev,
+            open: false
+        }));
+    };
 
+    const handleCloseSuccessAlert = () => {
+        setSuccessAlert(prev => ({
+            ...prev,
+            open: false
+        }));
+    };
 
     const [registrationRequest, setRegistrationRequest] = useState<RegistrationRequest>({
         email: '',
@@ -66,9 +74,7 @@ export default function Registration() {
         showPassword: false
     });
 
-    // @ts-ignore
-    const errorMessage: string | null = registrationError && registrationError.data.error;
-    const isValidForm: boolean = (validateEmail(registrationRequest.email) || validateName(registrationRequest.first_name) || validateName(registrationRequest.last_name) || validatePassword(registrationRequest.password))
+    const isValidForm: boolean = (validateEmail(registrationRequest.email) || validateName(registrationRequest.first_name) || validateName(registrationRequest.last_name))
 
     const handleFirstNameChange = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         setRegistrationRequest(prev => ({
@@ -89,25 +95,36 @@ export default function Registration() {
             ...prev,
             email: event.target.value.trim()
         }))
-    }
+    };
 
     const handlePasswordChange = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         setRegistrationRequest(prev => ({
             ...prev,
             password: event.target.value.trim()
         }))
-    }
+    };
     const handleSubmit = (event: FormEvent) => {
         event.preventDefault();
-        registration(registrationRequest)
-            .unwrap()
-            .then(() => {
-                navigate('/');
-                return;
-            })
-            .catch(() => {
-                return;
-            });
+        setRegistrationLoading(true);
+        const requestData: RegistrationRequest = {
+            email: registrationRequest.email,
+            password: registrationRequest.password,
+            first_name: registrationRequest.first_name,
+            last_name: registrationRequest.last_name
+        }
+        registration(requestData).then((res) => {
+            setRegistrationLoading(false);
+            setSuccessAlert(prev => ({
+                message: res.data.message,
+                open: true
+            }))
+        }).catch((err) => {
+            setRegistrationLoading(false);
+            setErrorAlert(() => ({
+                open: true,
+                message: err
+            }))
+        })
     };
 
     const handleToSignIn = () => {
@@ -146,7 +163,7 @@ export default function Registration() {
                                     inputProps={{
                                         maxLength: 30
                                     }}
-                                    helperText={validateName(registrationRequest.first_name) ? 'В имени не допускается использовние цифр!' : ''}
+                                    helperText={validateName(registrationRequest.first_name) ? 'В имени не допускается использовние только цифр!' : ''}
                                     error={validateName(registrationRequest.first_name)}
                                     onChange={handleFirstNameChange}
                                     autoFocus
@@ -160,7 +177,7 @@ export default function Registration() {
                                     label="Фамилия"
                                     name="lastName"
                                     autoComplete="family-name"
-                                    helperText={validateName(registrationRequest.last_name) ? 'В фамилии не допускается использовние цифр!' : ''}
+                                    helperText={validateName(registrationRequest.last_name) ? 'В фамилии не допускается использовние только цифр!' : ''}
                                     error={validateName(registrationRequest.last_name)}
                                     value={registrationRequest.last_name}
                                     inputProps={{
@@ -185,15 +202,13 @@ export default function Registration() {
                             </Grid>
                             <Grid item xs={12}>
                                 <FormControl sx={{width: '100%'}} variant="outlined">
-                                    <InputLabel required
-                                                error={validatePassword(registrationRequest.password)}>Пароль</InputLabel>
+                                    <InputLabel required>Пароль</InputLabel>
                                     <OutlinedInput
                                         fullWidth
                                         required
                                         inputProps={{
                                             maxLength: 30
                                         }}
-                                        error={validatePassword(registrationRequest.password)}
                                         type={registrationRequest.showPassword ? 'text' : 'password'}
                                         value={registrationRequest.password}
                                         onChange={handlePasswordChange}
@@ -242,7 +257,7 @@ export default function Registration() {
                 </Box>
                 <Copyright sx={{mt: 5}}/>
             </Container>
-            <Dialog open={openAlert}>
+            <Dialog open={errorAlert.open}>
                 <Alert
                     severity="warning"
                     color="error"
@@ -250,12 +265,26 @@ export default function Registration() {
                     closeText='Закрыть'
                     icon={<ReportIcon/>}
                     sx={{padding: '35px', fontFamily: '"Montserrat", sans-serif'}}
-                    onClose={handleCloseAlert}
+                    onClose={handleCloseErrorAlert}
                 >
                     <AlertTitle sx={{fontFamily: '"Montserrat", sans-serif'}}>Ошибка!</AlertTitle>
-                    {errorMessage}
+                    {errorAlert.message}
                 </Alert>
             </Dialog>
+            <SuccessRegistrationDialog open={successAlert.open}>
+                <Alert
+                    severity="success"
+                    color="success"
+                    role="button"
+                    closeText='Закрыть'
+                    icon={<Done/>}
+                    sx={{padding: '35px', fontFamily: '"Montserrat", sans-serif'}}
+                    onClose={handleCloseSuccessAlert}
+                >
+                    <AlertTitle sx={{fontFamily: '"Montserrat", sans-serif'}}>Успешная регистрация!</AlertTitle>
+                    {successAlert.message}
+                </Alert>
+            </SuccessRegistrationDialog>
         </>
     );
 }
