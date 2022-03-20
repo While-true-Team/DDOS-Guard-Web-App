@@ -38,6 +38,5 @@ jobs:
         with:
           context: .
           push: true
-          tags:
-            - "ghcr.io/${{ github.repository }}:stage"
+          tags: ghcr.io/${{ github.repository }}:stage
           labels: ${{ steps.meta.outputs.labels }}
