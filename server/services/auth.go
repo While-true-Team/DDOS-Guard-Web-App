@@ -165,7 +165,7 @@ func Refresh(c *gin.Context) {
 func Activation(c *gin.Context) {
 	emailCheck := models.EmailCheck{}
 	if err := models.DB.Where("uuid=?", c.Param("uuid")).First(&emailCheck).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "UUID не найден!"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Подтверждение не существует или недействительно!"})
 		return
 	}
 
@@ -180,5 +180,6 @@ func Activation(c *gin.Context) {
 
 	models.DB.Model(&user).Updates(userUpdate)
 	models.DB.Delete(&emailCheck)
-	c.Redirect(http.StatusMovedPermanently, "/")
+
+	c.JSON(http.StatusOK, gin.H{"message": "Аккаунт успешно активирован!"})
 }
