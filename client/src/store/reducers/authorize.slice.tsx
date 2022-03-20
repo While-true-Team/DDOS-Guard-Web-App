@@ -1,13 +1,17 @@
 import {createSlice, PayloadAction, isAnyOf} from '@reduxjs/toolkit';
 import {authorizeApi} from "../../services/authorize.service";
 import {AuthorizeResponse} from "../../models/authorize.model";
-import {accessTokenName} from "../../http";
+import jwtDecode from "jwt-decode";
 
 interface AuthorizeState {
     isLoading: boolean;
     refreshToken: string | null;
     accessToken: string | null;
     error: AuthResponseError | null;
+    userCredentials: {
+        email: string | null;
+        userId: string | null;
+    }
 }
 
 interface AuthResponseError {
@@ -17,10 +21,20 @@ interface AuthResponseError {
 
 const initialState: AuthorizeState = {
     isLoading: false,
-    accessToken: localStorage.getItem(accessTokenName),
+    accessToken: null,
     refreshToken: null,
     error: null,
+    userCredentials: {
+        email: null,
+        userId: null
+    }
 };
+
+interface TokenPayload {
+    email: string;
+    exp: number;
+    userid: number;
+}
 
 const AuthorizeSlice = createSlice({
     name: 'auth',
@@ -28,20 +42,20 @@ const AuthorizeSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         const isSuccessAuthAction = isAnyOf(authorizeApi.endpoints.login.matchFulfilled, authorizeApi.endpoints.registration.matchFulfilled, authorizeApi.endpoints.refresh.matchFulfilled);
+        const isLogoutAction = isAnyOf(authorizeApi.endpoints.logout.matchFulfilled, authorizeApi.endpoints.logout.matchRejected)
         builder
             .addMatcher(
                 isSuccessAuthAction,
                 (state: AuthorizeState, action: PayloadAction<AuthorizeResponse>) => {
-                    localStorage.setItem(accessTokenName, action.payload.tokens.access);
                     state.accessToken = action.payload.tokens.access;
+                    state.userCredentials.email = jwtDecode<TokenPayload>(action.payload.tokens.access).email;
+                    console.log(jwtDecode(action.payload.tokens.access));
                 })
             .addMatcher(
-                authorizeApi.endpoints.logout.matchFulfilled,
+                isLogoutAction,
                 (state: AuthorizeState) => {
-                    localStorage.removeItem('theme');
                     state.accessToken = null;
                 });
     },
 });
-
 export default AuthorizeSlice.reducer;

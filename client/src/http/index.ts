@@ -8,23 +8,22 @@ import {QueryReturnValue} from '@reduxjs/toolkit/dist/query/baseQueryTypes';
 import {FetchBaseQueryMeta} from '@reduxjs/toolkit/query/react';
 import {AuthorizeResponse} from "../models/authorize.model";
 import {authorizeApi} from "../services/authorize.service";
-
-export const accessTokenName: string = 'ddos_guard_app/access_token';
+import type {RootState} from '../store'
 
 const baseQuery = fetchBaseQuery({
     baseUrl: `${window.location.protocol + "//" + window.location.hostname}:8080/`,
     prepareHeaders: (headers, {
-        endpoint,
+        endpoint, getState
     }) => {
-        const token = localStorage.getItem(accessTokenName);
-        if (token && endpoint !== 'refresh') {
-            headers.set('Authorization', `Bearer ${token}`);
+        const tokenFromStore = (getState() as RootState).authReducer.accessToken;
+        if (tokenFromStore && endpoint !== 'refresh') {
+            headers.set('Authorization', `Bearer ${tokenFromStore}`);
         }
         return headers;
     },
     credentials: 'include',
 });
-
+console.log()
 export const baseQueryWithRefresh: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
     args,
     api,
@@ -35,7 +34,6 @@ export const baseQueryWithRefresh: BaseQueryFn<string | FetchArgs, unknown, Fetc
         type refreshRequest = QueryReturnValue<AuthorizeResponse, FetchBaseQueryError, FetchBaseQueryMeta>;
         const refresh: refreshRequest = await baseQuery('refresh', api, extraOptions) as refreshRequest;
         if (refresh.data) {
-            localStorage.setItem(accessTokenName, refresh.data.access);
             // повторяем наш начальный запрос
             request = await baseQuery(args, api, extraOptions);
         } else {

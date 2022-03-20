@@ -4,16 +4,16 @@ import "./index.scss";
 import App from "./app/App";
 import {store} from "./store";
 import {Provider} from "react-redux";
-import "@fontsource/montserrat/700.css";
 import {ChosenThemeProvider, ThemeProvider} from "./providers";
+import "@fontsource/montserrat/700.css";
 
 ReactDOM.render(
-    <Provider store={store}>
-        <ChosenThemeProvider>
-            <ThemeProvider>
+    <ChosenThemeProvider>
+        <ThemeProvider>
+            <Provider store={store}>
                 <App/>
-            </ThemeProvider>
-        </ChosenThemeProvider>
-    </Provider>,
+            </Provider>
+        </ThemeProvider>
+    </ChosenThemeProvider>,
     document.getElementById("app")
-);
+)

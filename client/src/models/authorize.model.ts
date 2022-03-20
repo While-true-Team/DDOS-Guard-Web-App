@@ -9,6 +9,7 @@ interface AuthorizeResponse {
 interface LoginRequest {
     email: string;
     password: string;
+    showPassword?: boolean;
 }
 
 interface RegistrationRequest {
@@ -16,6 +17,7 @@ interface RegistrationRequest {
     password: string;
     first_name: string;
     last_name: string;
+    showPassword?: boolean;
 }
 
 export type {AuthorizeResponse, LoginRequest, RegistrationRequest}

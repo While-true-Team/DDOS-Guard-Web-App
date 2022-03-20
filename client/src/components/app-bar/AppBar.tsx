@@ -11,9 +11,12 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import {FC, useContext} from "react";
 import {ChosenTheme} from "../../providers";
-import {styled, Switch} from "@mui/material";
+import {Divider, styled, Switch} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import {authorizeApi} from "../../services/authorize.service";
+import {useAppSelector} from "../../hooks/redux.hooks";
+import {getUserMail} from "../../store/selectors/userCredentials.selector";
+import {StyledTypography} from "../../styled-components/typography";
 
 
 const ThemeSwitch = styled(Switch)(({theme}) => ({
@@ -69,7 +72,7 @@ const DDosLogo = styled('div')(({theme}) => ({
     cursor: 'pointer',
     userSelect: 'none',
     whiteSpace: 'nowrap',
-    transition: '1s easy 0s',
+    transition: '250ms',
     display: 'block',
     font: '600 10px Helvetica,arial,sans-serif',
     textTransform: 'uppercase',
@@ -81,7 +84,7 @@ const DDosLogo = styled('div')(({theme}) => ({
         transition: '1s easy 0s',
         content: '""',
         height: '44px',
-        filter: theme.palette.mode === 'dark' ? 'sepia(90%)' : '',
+        filter: theme.palette.mode === 'dark' ? 'sepia(70%)' : '',
         display: 'block',
         margin: '0 auto 7px',
         background: "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNiA0MiI+DQogIDxkZWZzPg0KICAgIDxzdHlsZT4NCiAgICAgIC5hIHsNCiAgICAgICAgZmlsbDogIzMzOTllMDsNCiAgICAgIH0NCg0KICAgICAgLmIgew0KICAgICAgICBmaWxsOiAjZmZmOw0KICAgICAgfQ0KICAgIDwvc3R5bGU+DQogIDwvZGVmcz4NCiAgPHRpdGxlPmxvZ288L3RpdGxlPg0KICA8cGF0aCBjbGFzcz0iYSIgZD0iTTE4LjAwMDIsNDJDOC43Mjg0MSw0MS4xMzMzNS43MTY3NywyNC40MzYyNywwLDEwLjM1MzkzLDYuNTc3NzQsOS4zMjQ4NywxMy4wODMzLDUuMjU1NzYsMTguMDAwMiwwLDIyLjYyOTI3LDUuMTM5NzUsMjkuNDIyMjQsOS4zMjQ4NywzNiwxMC4zNTM5MywzNS4yODMyNCwyNC40MzYyNywyNy4yNzE5LDQxLjEzMzM1LDE4LjAwMDIsNDIiLz4NCiAgPHBhdGggY2xhc3M9ImIiIGQ9Ik0xMS4wNTgzMywyNC4yNjc2NFYyMi44OTc0OGw2LjY3MDMyLS45MjEwNVYyMC4wNDA1NUwxMS4wNTgzMywyMS40MTlWMjAuMDEwODNMMTcuNywxNy44MjM0M3YtMS43MTZsLTYuNjQxNjYsMi40NDg4VjE3LjI0NjU0TDE3LjcsMTQuMTE2VjExLjk2MzUybC02LjY0MTY2LDMuOTA2MjdWMTQuNzg1MTZMMTcuOTMwMzksOS42OTVsNi45MDEsNS4yNjQ1VjI1LjkyNTMxaC44NjMyMnYxLjk3ODEzSDEwLjMxMTE2VjI1LjkyNTMxSDE3LjdWMjMuODg4ODJaIi8+DQo8L3N2Zz4NCg==') center no-repeat",
@@ -101,6 +104,8 @@ const AppBar: FC = () => {
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
     const [logout, {}] = authorizeApi.useLogoutMutation();
+
+    const userEmail = useAppSelector(getUserMail)
 
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget);
@@ -139,7 +144,7 @@ const AppBar: FC = () => {
                     <Typography
                         noWrap
                         component="div"
-                        sx={{cursor: 'pointer', mr: 2, display: {xs: 'none', md: 'flex'}}}
+                        sx={{cursor: 'pointer', mr: 2, display: {md: 'flex'}}}
                         onClick={handleGoHome}
                     >
                         <DDosLogo>
@@ -175,6 +180,12 @@ const AppBar: FC = () => {
                             open={Boolean(anchorElUser)}
                             onClose={handleCloseUserMenu}
                         >
+                            {userEmail &&
+                                <StyledTypography sx={{padding: '15px'}}>
+                                    {userEmail}
+                                </StyledTypography>
+                            }
+                            <Divider orientation='horizontal'/>
                             <MenuItem onClick={handleGoToProfile}>
                                 <Typography textAlign="center">Профиль</Typography>
                             </MenuItem>
