@@ -58,7 +58,7 @@ const Account = () => {
                             аутентификацию по почте.
                         </StyledButton>
                         <StyledTypography sx={{color: 'red', marginTop: '10px'}}>
-                            Для подключения необходимо подвтердить почту!
+                            Для подключения необходимо подтвердить почту!
                         </StyledTypography>
                     </StyledPaper>
                     <StyledPaper sx={{marginTop: '100px'}} elevation={10}>

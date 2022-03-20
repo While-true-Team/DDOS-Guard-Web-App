@@ -9,6 +9,7 @@ const AccountPage = React.lazy(() => import('../../pages/account/Account'));
 const NotFound = React.lazy(() => import('../../pages/not-found/NotFound'));
 const SignIn = React.lazy(() => import('../../pages/sign-in/SignIn'));
 const SignUp = React.lazy(() => import('../../pages/sign-up/SignUp'));
+const EmailActivate = React.lazy(() => import('../../utils/EmailActivate'));
 
 const PageLoader = styled(LinearProgress)(({theme}) => ({
     borderRadius: 5,
@@ -40,6 +41,12 @@ const signUp = (
     </Suspense>
 );
 
+const emailActivate = (
+    <Suspense fallback={<PageLoader/>}>
+        <EmailActivate/>
+    </Suspense>
+)
+
 const AppRoutes = (
     <>
         <AppBar/>
@@ -55,6 +62,7 @@ const AuthorizeRoutes = (
         <Route path='/' element={signIn}/>
         <Route path='/sign-up' element={signUp}/>
         <Route path="*" element={notFound}/>
+        <Route path='/activation/:uuid' element={emailActivate}/>
     </Routes>
 )
 
