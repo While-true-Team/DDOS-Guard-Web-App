@@ -20,7 +20,7 @@ import {Dialog, FormControl, InputAdornment, InputLabel, OutlinedInput, styled} 
 import IconButton from "@mui/material/IconButton";
 import {
     validateName,
-    validateEmail
+    validateEmail, validatePassword
 } from "../../validators/authorization.validators";
 import {StyledLink} from "../../styled-components/link";
 import ReportIcon from "@mui/icons-material/Report";
@@ -74,7 +74,7 @@ export default function Registration() {
         showPassword: false
     });
 
-    const isValidForm: boolean = (validateEmail(registrationRequest.email) || validateName(registrationRequest.first_name) || validateName(registrationRequest.last_name))
+    const isValidForm: boolean = (validateEmail(registrationRequest.email) || validateName(registrationRequest.first_name) || validateName(registrationRequest.last_name) || validatePassword(registrationRequest.password))
 
     const handleFirstNameChange = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         setRegistrationRequest(prev => ({
@@ -122,7 +122,7 @@ export default function Registration() {
             setRegistrationLoading(false);
             setErrorAlert(() => ({
                 open: true,
-                message: err
+                message: err.response.data.error
             }))
         })
     };
@@ -210,6 +210,7 @@ export default function Registration() {
                                             maxLength: 30
                                         }}
                                         type={registrationRequest.showPassword ? 'text' : 'password'}
+                                        error={validatePassword(registrationRequest.password)}
                                         value={registrationRequest.password}
                                         onChange={handlePasswordChange}
                                         endAdornment={

@@ -17,10 +17,9 @@ import {ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useState} from 
 import ReportIcon from '@mui/icons-material/Report';
 import {Alert, AlertTitle, LoadingButton} from "@mui/lab";
 import {StyledLink} from "../../styled-components/link";
-import {validateEmail} from "../../validators/authorization.validators";
+import {validateEmail, validatePassword} from "../../validators/authorization.validators";
 import IconButton from "@mui/material/IconButton";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
-
 
 export default function SignIn() {
     const navigate = useNavigate();
@@ -66,7 +65,7 @@ export default function SignIn() {
         }))
     }
 
-    const isNotValidForm = validateEmail(loginRequest.email);
+    const isNotValidForm = validateEmail(loginRequest.email) || validatePassword(loginRequest.password);
 
     const handleSubmit = (event: FormEvent) => {
         event.preventDefault();
@@ -128,6 +127,7 @@ export default function SignIn() {
                                 }}
                                 type={loginRequest.showPassword ? 'text' : 'password'}
                                 value={loginRequest.password}
+                                error={validatePassword(loginRequest.password)}
                                 onChange={handleLoginRequestPasswordChange}
                                 endAdornment={
                                     <InputAdornment position="end">
@@ -165,7 +165,8 @@ export default function SignIn() {
                                 </StyledLink>
                             </Grid>
                             <Grid item>
-                                <StyledLink mr={1} title='Перейти к регистрации.' variant="body2" onClick={handleGoToSignUp}>
+                                <StyledLink mr={1} title='Перейти к регистрации.' variant="body2"
+                                            onClick={handleGoToSignUp}>
                                     Нет аккаунта? Зарегестрируйтесь!
                                 </StyledLink>
                             </Grid>
