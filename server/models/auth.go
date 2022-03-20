@@ -1,11 +1,12 @@
 package models
 
 type User struct {
-	ID        uint   `json:"id" gorm:"primary_key"`
-	Email     string `json:"email"`
-	Password  string `json:"password"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
+	ID         uint   `json:"id" gorm:"primary_key"`
+	Email      string `json:"email"`
+	Password   string `json:"password"`
+	FirstName  string `json:"first_name"`
+	LastName   string `json:"last_name"`
+	EmailCheck bool   `json:"email_check"`
 }
 
 type UserLoginData struct {
@@ -26,5 +27,7 @@ type Token struct {
 	Refresh string `json:"refresh"`
 }
 
-type TokenData struct {
+type EmailCheck struct {
+	ID   uint   `json:"id"`
+	UUID string `json:"uuid"`
 }

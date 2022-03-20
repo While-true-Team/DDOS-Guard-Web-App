@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/google/uuid"
 	"go-server/models"
 	"net/http"
 	"os"
@@ -25,15 +26,15 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	user := models.User{Email: input.Email, Password: input.Password, FirstName: input.FirstName, LastName: input.LastName}
+	user := models.User{Email: input.Email, Password: input.Password, FirstName: input.FirstName, LastName: input.LastName, EmailCheck: false}
 	models.DB.Create(&user)
 
-	tokens := models.Token{ID: user.ID, Access: CreateToken(user), Refresh: CreateTokenRefresh()}
+	emailCheck := models.EmailCheck{ID: user.ID, UUID: uuid.New().String()}
+	models.DB.Create(&emailCheck)
 
-	models.DB.Create(&tokens)
+	SendEmailUUID(user.Email, emailCheck.UUID)
 
-	c.SetCookie("refresh_token", tokens.Refresh, 60*60*24*30, "/", "", false, true) // if https: secure = true
-	c.JSON(http.StatusOK, gin.H{"tokens": tokens.Access})
+	c.JSON(http.StatusOK, gin.H{"attention": "Мы отправили письмо с подтверждением на вашу электронную почту. Вы сможете зайти на аккант только после подтверждения."})
 }
 
 func LoginUser(c *gin.Context) {
@@ -56,18 +57,23 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 
+	if !user.EmailCheck {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Подтвердите адрес электронной почты!"})
+		return
+	}
+
 	token := models.Token{}
 	tokens := models.Token{ID: user.ID, Access: CreateToken(user), Refresh: CreateTokenRefresh()}
 
 	if err := models.DB.Where("id=?", user.ID).First(&token).Error; err != nil {
 		models.DB.Create(&tokens)
-		c.SetCookie("refresh_token", tokens.Refresh, 60*60*24*30, "/", "", false, true) // if https: secure = true
+		c.SetCookie("refresh_token", tokens.Refresh, 60*60*24*30, "/", os.Getenv("cookie_http"), false, true) // if https: secure = true
 		c.JSON(http.StatusOK, gin.H{"access": tokens.Access})
 		return
 	}
 
 	models.DB.Model(&token).Updates(tokens)
-	c.SetCookie("refresh_token", tokens.Refresh, 60*60*24*30, "/", "", false, true) // if https: secure = true
+	c.SetCookie("refresh_token", tokens.Refresh, 60*60*24*30, "/", os.Getenv("cookie_http"), false, true) // if https: secure = true
 	c.JSON(http.StatusOK, gin.H{"access": tokens.Access})
 }
 
@@ -152,5 +158,27 @@ func Refresh(c *gin.Context) {
 		models.DB.Delete(&token)
 	}
 
+	c.SetCookie("refresh_token", "", -1, "/", "", false, true)
 	c.JSON(http.StatusConflict, gin.H{"error": "Рефреш токен не валидный"})
+}
+
+func Activation(c *gin.Context) {
+	emailCheck := models.EmailCheck{}
+	if err := models.DB.Where("uuid=?", c.Param("uuid")).First(&emailCheck).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "UUID не найден!"})
+		return
+	}
+
+	user := models.User{}
+	userUpdate := models.User{EmailCheck: true}
+
+	if err := models.DB.Where("id=?", emailCheck.ID).First(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Аккаунт не найден!"})
+		models.DB.Delete(&emailCheck)
+		return
+	}
+
+	models.DB.Model(&user).Updates(userUpdate)
+	models.DB.Delete(&emailCheck)
+	c.Redirect(http.StatusMovedPermanently, "/")
 }

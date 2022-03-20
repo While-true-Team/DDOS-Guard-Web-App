@@ -29,6 +29,7 @@ func main() {
 
 	r.GET("/books", controllers.FindBooks)
 	r.GET("/books/:id", controllers.FindBook)
+	r.GET("/activation/:uuid", services.Activation)
 	r.POST("/logout", services.Logout)
 	r.POST("/login", services.LoginUser)
 	r.POST("/register", services.RegisterUser)
