@@ -1,6 +1,6 @@
-# Web Starter Kit
+# DDoS Gruard Web App
 
-## Данный репозиторий является шаблоном для WEB приложений
+## Данная работа выполнена для кейса от DDoS Guard на хакатоне Spring 2022 в ДГТУ
 
 Клиент: Язык <b>TypeScript</b>. Фреймворки: <b>ReactJS</b>, <b>React Redux Toolkit</b>.</br>
 Сервер: Язык <b>Golang</b>. Фреймворки: <b>Gim</b>, <b>Gorn</b>.</br>
