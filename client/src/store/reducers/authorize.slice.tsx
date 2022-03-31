@@ -20,7 +20,7 @@ interface AuthResponseError {
 }
 
 const initialState: AuthorizeState = {
-    isLoading: false,
+    isLoading: true,
     accessToken: null,
     refreshToken: null,
     error: null,
@@ -42,18 +42,27 @@ const AuthorizeSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         const isSuccessAuthAction = isAnyOf(authorizeApi.endpoints.login.matchFulfilled, authorizeApi.endpoints.refresh.matchFulfilled);
-        const isLogoutAction = isAnyOf(authorizeApi.endpoints.logout.matchFulfilled, authorizeApi.endpoints.logout.matchRejected)
+        const isLogoutAction = isAnyOf(authorizeApi.endpoints.logout.matchFulfilled, authorizeApi.endpoints.logout.matchRejected);
+        const isErrorAuthAction = isAnyOf(authorizeApi.endpoints.login.matchRejected, authorizeApi.endpoints.refresh.matchRejected);
         builder
             .addMatcher(
                 isSuccessAuthAction,
                 (state: AuthorizeState, action: PayloadAction<AuthorizeResponse>) => {
                     state.accessToken = action.payload.access;
                     state.userCredentials.email = jwtDecode<TokenPayload>(action.payload.access).email;
+                    state.isLoading = false;
                 })
             .addMatcher(
                 isLogoutAction,
                 (state: AuthorizeState) => {
                     state.accessToken = null;
+                    state.isLoading = false;
+                })
+            .addMatcher(
+                isErrorAuthAction,
+                (state: AuthorizeState) => {
+                    state.accessToken = null;
+                    state.isLoading = false;
                 });
     },
 });
