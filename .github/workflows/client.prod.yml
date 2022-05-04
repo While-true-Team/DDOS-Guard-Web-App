@@ -32,11 +32,11 @@ jobs:
       run: npm install
       
     - name: Create .env file
-  # You may pin to the exact commit or the version.
-  # uses: SpicyPizza/create-envfile@a8e32e193370fc80ac4d090ac674b4ae101dc97d
       uses: SpicyPizza/create-envfile@v1.3.0
       with:
-      # The filename for the envfile
+        directory: client
+        file_name: .env
+        fail_on_empty: false
         envkey_VITE_RECAPTCHA_PUBLIC: ${{ secrets.VITE_RECAPTCHA_PUBLIC }}
 
     - name: Build client-side
