@@ -34,10 +34,9 @@ jobs:
     - name: Create .env file
       uses: SpicyPizza/create-envfile@v1.3.1
       with:
-        directory: client
+        envkey_VITE_RECAPTCHA_PUBLIC: ${{ secrets.VITE_RECAPTCHA_PUBLIC }}
         file_name: .env
         fail_on_empty: false
-        envkey_VITE_RECAPTCHA_PUBLIC: ${{ secrets.VITE_RECAPTCHA_PUBLIC }}
 
     - name: Build client-side
       run: npm run build --if-present
