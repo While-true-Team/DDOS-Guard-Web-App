@@ -32,7 +32,7 @@ jobs:
       run: npm install
       
     - name: Create .env file
-      uses: SpicyPizza/create-envfile@v1.3.0
+      uses: SpicyPizza/create-envfile@v1.2.0
       with:
         directory: client
         file_name: .env
